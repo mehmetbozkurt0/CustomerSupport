@@ -1,0 +1,35 @@
+    -- Biletler (Tickets) Tablosu
+    CREATE TABLE Ticket (
+        id TEXT NOT NULL PRIMARY KEY,
+        title TEXT NOT NULL,
+        status TEXT NOT NULL,
+        lastMessage TEXT,
+        timestamp INTEGER NOT NULL
+    );
+
+    -- Mesajlar Tablosu
+    CREATE TABLE Message (
+        id TEXT NOT NULL PRIMARY KEY,
+        ticketId TEXT NOT NULL,
+        sender TEXT NOT NULL,
+        content TEXT NOT NULL,
+        timestamp INTEGER NOT NULL
+    );
+
+    -- Biletleri Listeleme Sorgusu
+    getAllTickets:
+    SELECT * FROM Ticket ORDER BY timestamp DESC;
+
+    -- Yeni Bilet Ekleme/Güncelleme Sorgusu
+    insertTicket:
+    INSERT OR REPLACE INTO Ticket(id, title, status, lastMessage, timestamp)
+    VALUES (?, ?, ?, ?, ?);
+
+    -- Belirli Bir Bilete Ait Mesajları Getirme Sorgusu
+    getMessagesForTicket:
+    SELECT * FROM Message WHERE ticketId = ? ORDER BY timestamp ASC;
+
+    -- Yeni Mesaj Ekleme Sorgusu
+    insertMessage:
+    INSERT OR REPLACE INTO Message(id, ticketId, sender, content, timestamp)
+    VALUES (?, ?, ?, ?, ?);
