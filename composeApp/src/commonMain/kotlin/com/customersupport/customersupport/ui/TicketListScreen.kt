@@ -11,6 +11,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -23,31 +26,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-data class Ticket(
-    val id: String,
-    val title: String,
-    val status: String,
-    val lastMessage: String,
-    val date: String
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TicketListScreen(onTicketClick: () -> Unit, onLogout: () -> Unit) {
+fun TicketListScreen(viewModel: TicketViewModel, onTicketClick: () -> Unit, onLogout: () -> Unit) {
     val primaryDark = Color(0xFF002255)
     val primaryBlue = Color(0xFF0047AB)
     val backgroundColor = Color(0xFFF8F9FB)
     val subtleGray = Color(0xFF75777E)
 
-    val mockTickets = listOf(
-        Ticket("#10482", "Ödeme Sistemi Hatası", "Açık", "Yeni kredi kartımla fatura bilgilerimi güncellemeye çalıştım ancak sistem...", "Şimdi"),
-        Ticket("#10475", "Hesap Senkronizasyon Sorunu", "Beklemede", "Selam ekip, hala senkronizasyon hatasıyla ilgili logları bekliyoruz...", "Dün"),
-        Ticket("#10420", "Şifre Sıfırlama Bağlantısı", "Çözüldü", "Teşekkürler, manuel sıfırlama bağlantısı kusursuz çalıştı.", "12 Eki"),
-        Ticket("#10390", "Uygulama Çökme Sorunu", "Çözüldü", "Son güncellemeyi yaptıktan sonra düzeldi, teşekkürler.", "05 Eki")
-    )
+    LaunchedEffect(Unit) {
+        viewModel.fetchTickets()
+    }
+
+    val tickets by viewModel.tickets.collectAsState()
+    val isLoading by viewModel.isLoadingTickets.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize().background(backgroundColor)) {
-
         Box(
             modifier = Modifier
                 .size(400.dp)
@@ -133,12 +128,24 @@ fun TicketListScreen(onTicketClick: () -> Unit, onLogout: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(bottom = 90.dp)
-                ) {
-                    items(mockTickets) { ticket ->
-                        TicketCard(ticket = ticket, onClick = onTicketClick)
+                if (isLoading) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(color = primaryBlue)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Talepleriniz güncelleniyor...", color = subtleGray, fontSize = 15.sp)
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(bottom = 90.dp)
+                    ) {
+                        items(tickets) { ticket ->
+                            TicketCard(ticket = ticket, onClick = onTicketClick)
+                        }
                     }
                 }
             }
@@ -147,7 +154,7 @@ fun TicketListScreen(onTicketClick: () -> Unit, onLogout: () -> Unit) {
 }
 
 @Composable
-fun TicketCard(ticket: Ticket, onClick: () -> Unit) {
+fun TicketCard(ticket: UiTicket, onClick: () -> Unit) {
     val statusColor = when (ticket.status) {
         "Açık" -> Color(0xFF0047AB)
         "Beklemede" -> Color(0xFFF57C00)
@@ -158,7 +165,6 @@ fun TicketCard(ticket: Ticket, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-
             .border(1.5.dp, Color.White.copy(alpha = 0.9f), RoundedCornerShape(24.dp))
             .shadow(elevation = 8.dp, shape = RoundedCornerShape(24.dp), spotColor = Color(0xFF002255).copy(alpha = 0.15f))
             .clickable { onClick() },

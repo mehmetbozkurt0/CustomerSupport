@@ -28,7 +28,7 @@ data class ChatMessage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(onBack: () -> Unit, onVideoCall: () -> Unit) {
+fun ChatScreen(viewModel: TicketViewModel, onBack: () -> Unit, onVideoCall: () -> Unit) {
     val primaryDark = Color(0xFF002255)
     val primaryBlue = Color(0xFF0047AB)
     val backgroundColor = Color(0xFFF8F9FB)
@@ -36,11 +36,7 @@ fun ChatScreen(onBack: () -> Unit, onVideoCall: () -> Unit) {
 
     var messageText by remember { mutableStateOf("") }
 
-    val mockMessages = listOf(
-        ChatMessage("1", "Merhaba! Destek ekibine ulaştığınız için teşekkürler. #10482 numaralı biletiniz hakkında size nasıl yardımcı olabilirim?", false, "10:42"),
-        ChatMessage("2", "Evet, yeni kredi kartımla fatura bilgilerimi güncellemeye çalıştım ancak sistem sürekli hata veriyor. Acaba sorun nedir?", true, "10:44"),
-        ChatMessage("3", "Bunu sizin için hemen kontrol ediyorum. Sistem loglarına bakmam için lütfen kısa bir saniye bekleyin.", false, "10:45")
-    )
+    val messages by viewModel.chatMessages.collectAsState()
 
     Scaffold(
         containerColor = backgroundColor,
@@ -142,6 +138,7 @@ fun ChatScreen(onBack: () -> Unit, onVideoCall: () -> Unit) {
                     IconButton(
                         onClick = {
                             if (messageText.isNotBlank()) {
+                                viewModel.sendMessage(messageText)
                                 messageText = ""
                             }
                         },
@@ -175,7 +172,7 @@ fun ChatScreen(onBack: () -> Unit, onVideoCall: () -> Unit) {
                 }
             }
 
-            items(mockMessages) { message ->
+            items(messages) { message ->
                 MessageBubble(message = message, primaryBlue = primaryBlue)
             }
         }
