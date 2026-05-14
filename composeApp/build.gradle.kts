@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.cio)
             implementation(libs.sqldelight.android)
+            implementation(libs.agora.rtc)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

@@ -70,13 +70,21 @@ fun VideoCallScreen(onEndCall: () -> Unit) {
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.DarkGray)
         ) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = if (isCameraOff) "Kamera Kapalı" else "Sen",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+            if (!isCameraOff) {
+                AgoraVideoView(
+                    modifier = Modifier.fillMaxSize(),
+                    channelName = "destek_odasi_1",
+                    onCallEnded = onEndCall
                 )
+            } else {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Kamera Kapalı",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
 

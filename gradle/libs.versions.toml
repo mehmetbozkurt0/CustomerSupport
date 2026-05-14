@@ -17,6 +17,7 @@ ktor = "2.3.9"
 sqldelight = "2.1.0"
 coroutines = "1.8.0"
 serialization = "1.6.3"
+agora = "4.2.6"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -48,6 +49,7 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+agora-rtc = { module = "io.agora.rtc:full-sdk", version.ref = "agora" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
