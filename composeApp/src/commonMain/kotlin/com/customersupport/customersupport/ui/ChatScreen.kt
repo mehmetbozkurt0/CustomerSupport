@@ -14,10 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import customersupport.composeapp.generated.resources.Res
+import customersupport.composeapp.generated.resources.ic_cam
+import customersupport.composeapp.generated.resources.ic_phone
+import org.jetbrains.compose.resources.painterResource
+
 
 data class ChatMessage(
     val id: String,
@@ -35,6 +41,8 @@ fun ChatScreen(viewModel: TicketViewModel, onBack: () -> Unit, onVideoCall: () -
     val surfaceColor = Color.White
 
     var messageText by remember { mutableStateOf("") }
+
+    val uriHandler = LocalUriHandler.current
 
     val messages by viewModel.chatMessages.collectAsState()
 
@@ -81,14 +89,36 @@ fun ChatScreen(viewModel: TicketViewModel, onBack: () -> Unit, onVideoCall: () -
                         }
                     },
                     actions = {
+                        //Click to Call Butonu
+                        IconButton(
+                            onClick = { uriHandler.openUri("tel:+908501234567") },
+                            modifier = Modifier
+                                .size(38.dp)
+                                .background(backgroundColor, CircleShape)
+                        ) {
+                            Icon(
+                                painterResource(Res.drawable.ic_phone),
+                                contentDescription = "Ara",
+                                tint = primaryBlue,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
                         IconButton(
                             onClick = onVideoCall,
                             modifier = Modifier
                                 .padding(end = 12.dp)
                                 .size(38.dp)
-                                .background(primaryBlue.copy(alpha = 0.1f), CircleShape)
+                                .background(backgroundColor, CircleShape)
                         ) {
-                            Text("📞", fontSize = 16.sp)
+                            Icon(
+                                painter = painterResource(Res.drawable.ic_cam),
+                                contentDescription = "Görüntülü Ara",
+                                tint = primaryBlue,
+                                modifier = Modifier.size(22.dp)
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = surfaceColor)

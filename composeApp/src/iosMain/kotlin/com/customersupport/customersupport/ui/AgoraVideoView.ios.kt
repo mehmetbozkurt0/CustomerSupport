@@ -11,6 +11,8 @@ import androidx.compose.ui.graphics.Color
 actual @Composable fun AgoraVideoView(
     modifier: Modifier,
     channelName: String,
+    isMuted: Boolean,
+    isCameraOff: Boolean,
     onCallEnded: () -> Unit
 ) {
     Box(modifier = modifier.background(Color.Black), contentAlignment = Alignment.Center) {
