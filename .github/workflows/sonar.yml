@@ -35,6 +35,24 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
+      - name: Create dummy google-services.json
+        run: |
+          cat <<EOF > composeApp/google-services.json
+          {
+            "project_info": { "project_number": "123", "project_id": "dummy" },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123:android:abc", 
+                  "android_client_info": { "package_name": "com.customersupport.customersupport" }
+                },
+                "api_key": [ { "current_key": "dummy" } ]
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
