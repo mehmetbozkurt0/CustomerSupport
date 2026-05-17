@@ -14,6 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -34,6 +37,9 @@ fun TicketListScreen(viewModel: TicketViewModel, onTicketClick: () -> Unit, onLo
     val primaryBlue = Color(0xFF0047AB)
     val backgroundColor = Color(0xFFF8F9FB)
     val subtleGray = Color(0xFF75777E)
+
+    var showCreateDialog by remember { mutableStateOf(false) }
+    var newTicketSubject by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.fetchTickets()
@@ -103,7 +109,7 @@ fun TicketListScreen(viewModel: TicketViewModel, onTicketClick: () -> Unit, onLo
             },
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { /* Yeni talep */ },
+                    onClick = { showCreateDialog = true },
                     containerColor = primaryBlue,
                     contentColor = Color.White,
                     shape = RoundedCornerShape(20.dp),
@@ -149,6 +155,54 @@ fun TicketListScreen(viewModel: TicketViewModel, onTicketClick: () -> Unit, onLo
                     }
                 }
             }
+        }
+        if (showCreateDialog) {
+            AlertDialog(
+                onDismissRequest = { showCreateDialog = false },
+                title = {
+                    Text("Yeni Talep Oluştur", fontWeight = FontWeight.Bold, color = primaryDark)
+                },
+                text = {
+                    OutlinedTextField(
+                        value = newTicketSubject,
+                        onValueChange = { newTicketSubject = it },
+                        placeholder = { Text("Kısaca sorununuz nedir?") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = primaryBlue,
+                            unfocusedBorderColor = subtleGray
+                        )
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            if (newTicketSubject.isNotBlank()) {
+                                viewModel.addTicket(newTicketSubject)
+
+                                showCreateDialog = false
+                                newTicketSubject = ""
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryBlue)
+                    ) {
+                        Text("Oluştur", color = Color.White)
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            showCreateDialog = false
+                            newTicketSubject = ""
+                        }
+                    ) {
+                        Text("İptal", color = subtleGray)
+                    }
+                },
+                containerColor = Color.White,
+                shape = RoundedCornerShape(20.dp)
+            )
         }
     }
 }

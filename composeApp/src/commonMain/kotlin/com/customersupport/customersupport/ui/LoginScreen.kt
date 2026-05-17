@@ -20,12 +20,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
+
+    var isLoading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     val primaryDark = Color(0xFF002255)
     val primaryBlue = Color(0xFF0047AB)
@@ -144,7 +149,13 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 onClick = {
                     if (email.isNotBlank() && password.isNotBlank()) {
                         isError = false
-                        onLoginSuccess()
+                        coroutineScope.launch {
+                            isLoading = true
+                            delay(1500)
+                            println("Auth başarılı, yönlendiriliyor...")
+                            isLoading = false
+                            onLoginSuccess()
+                        }
                     } else {
                         isError = true
                     }
@@ -155,7 +166,8 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                     .shadow(elevation = 15.dp, shape = RoundedCornerShape(30.dp), spotColor = primaryBlue),
                 shape = RoundedCornerShape(30.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                contentPadding = PaddingValues()
+                contentPadding = PaddingValues(),
+                enabled = !isLoading
             ) {
                 Box(
                     modifier = Modifier
@@ -163,7 +175,15 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                         .background(Brush.horizontalGradient(listOf(primaryBlue, primaryDark))),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Giriş Yap", fontSize = 18.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(30.dp),
+                            strokeWidth = 3.dp
+                        )
+                    } else {
+                        Text("Giriş Yap", fontSize = 18.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
 

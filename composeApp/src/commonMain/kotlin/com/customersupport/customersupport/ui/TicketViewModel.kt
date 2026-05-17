@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlin.time.Clock
 
 @Serializable
 data class DummyResponse(
@@ -113,6 +114,21 @@ class TicketViewModel(database: AppDatabase) : ViewModel() {
                 )
                 _chatMessages.update { currentList -> currentList + errorMessage }
             }
+        }
+    }
+
+    fun addTicket(subject: String) {
+        viewModelScope.launch {
+            val newId = "#${(10000..99999).random()}"
+            queries.insertTicket(
+                newId,
+                subject,
+                "Açık",
+                "Destek talebiniz alınmıştır. En kısa sürede dönüş yapılacaktır.",
+                Clock.System.now().toEpochMilliseconds()
+            )
+
+            fetchTickets()
         }
     }
 }
